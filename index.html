@@ -14,11 +14,17 @@
     <!-- 1. Подключаем VK Bridge -->
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
-    <!-- 2. Отправляем сигнал готовности ВК (только если игра открыта внутри ВК) -->
     <script>
-        if (window.vkontakte && vkontakte.vkBridge) {
-            vkontakte.vkBridge.send('VKWebAppInit');
-        }
+        window.addEventListener('DOMContentLoaded', function() {
+            // Пробуем разные варианты имени объекта
+            var bridge = window.vkBridge || (window.vkontakte && window.vkontakte.vkBridge);
+            if (bridge) {
+                bridge.send('VKWebAppInit');
+                console.log('VK INIT SUCCESS');
+            } else {
+                console.log('VK INIT FAILED');
+            }
+        });
     </script>
 
     <script src="sprites.js"></script>
