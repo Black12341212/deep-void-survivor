@@ -60,6 +60,7 @@ class SoundEngine {
         this.musicCtx = null;
     }
     init() {
+        return; // Sound loading disabled
         if (this.loaded) return;
         const sfxPaths = {
             'playerShoot':'sfx/player/player-shoot.mp3','playerShootTriple':'sfx/player/player-shoot-triple.mp3',
