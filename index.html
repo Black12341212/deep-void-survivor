@@ -10,6 +10,17 @@
     <div id="game-container">
         <canvas id="gameCanvas"></canvas>
     </div>
+
+    <!-- 1. Подключаем VK Bridge -->
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+
+    <!-- 2. Отправляем сигнал готовности ВК (только если игра открыта внутри ВК) -->
+    <script>
+        if (window.vkontakte && vkontakte.vkBridge) {
+            vkontakte.vkBridge.send('VKWebAppInit');
+        }
+    </script>
+
     <script src="sprites.js"></script>
     <script src="game.js"></script>
 </body>
