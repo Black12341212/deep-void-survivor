@@ -44,132 +44,28 @@ class InputManager {
     clearJustPressed() { this.justPressed = {}; this.mouseJustClicked = false; }
 }
 // ============================================
-// Sound Engine — .mp3 file loader
+// Sound Engine — disabled (no audio on GitHub Pages)
 // ============================================
 
 class SoundEngine {
-    constructor() {
-        this.enabled = true;
-        this.sounds = {};
-        this.music = {};
-        this.volume = 0.25;
-        this.basePath = 'sounds/';
-        this.loaded = false;
-        this.musicNode = null;
-        this.musicGain = null;
-        this.musicCtx = null;
-    }
-    init() {
-        return; // Sound loading disabled
-        if (this.loaded) return;
-        const sfxPaths = {
-            'playerShoot':'sfx/player/player-shoot.mp3','playerShootTriple':'sfx/player/player-shoot-triple.mp3',
-            'playerHit':'sfx/player/player-hit.mp3','playerDeath':'sfx/player/player-death.mp3',
-            'dash':'sfx/player/player-dash.mp3','enemyHit':'sfx/enemy/enemy-hit.mp3',
-            'enemyDeath':'sfx/enemy/enemy-death.mp3','minibossAppear':'sfx/enemy/miniboss-appear.mp3',
-            'eliteAppear':'sfx/enemy/elite-appear.mp3','blinkTeleport':'sfx/enemy/blink-teleport.mp3',
-            'swarmBuzz':'sfx/enemy/swarm-buzz.mp3','cloneSplit':'sfx/enemy/clone-split.mp3',
-            'ghostPhase':'sfx/enemy/ghost-phase.mp3','bossAppear':'sfx/enemy/boss-appear.mp3',
-            'explosion':'sfx/combat/explosion.mp3','combo':'sfx/combat/combo.mp3',
-            'comboHigh':'sfx/combat/combo-high.mp3','laserWarning':'sfx/hazards/laser-warning.mp3',
-            'puddlePlace':'sfx/hazards/puddle-place.mp3','slowDebuff':'sfx/hazards/slow-debuff.mp3',
-            'menuClick':'sfx/ui/menu-click.mp3','upgradeSelect':'sfx/ui/upgrade-select.mp3',
-            'shieldActivate':'sfx/ui/shield-activate.mp3','prestige':'sfx/ui/prestige.mp3',
-            'tooltipShow':'sfx/ui/tooltip-show.mp3','pauseOpen':'sfx/ui/pause-open.mp3',
-            'statReveal':'sfx/ui/stat-reveal.mp3','achievementUnlock':'sfx/ui/achievement-unlock.mp3',
-            'achievementScreenOpen':'sfx/ui/achievement-screen-open.mp3',
-            'cosmeticUnlock':'sfx/ui/cosmetic-unlock.mp3','skillTreeOpen':'sfx/ui/skill-tree-open.mp3',
-            'skillUnlock':'sfx/ui/skill-unlock.mp3','skillConfirm':'sfx/ui/skill-confirm.mp3',
-            'recordNew':'sfx/ui/record-new.mp3','waveStart':'sfx/ui/wave-start.mp3','modifierInversion':'sfx/modifiers/modifier-inversion.mp3',
-            'modifierFog':'sfx/modifiers/modifier-fog.mp3','modifierRicochet':'sfx/modifiers/modifier-ricochet.mp3',
-            'modifierGrowth':'sfx/modifiers/modifier-growth.mp3','modifierChaos':'sfx/modifiers/modifier-chaos.mp3',
-            'artifactDrop':'sfx/artifacts/artifact-drop.mp3','artifactPickup':'sfx/artifacts/artifact-pickup.mp3',
-            'stasisBlock':'sfx/artifacts/stasis-block.mp3','echoShot':'sfx/artifacts/echo-shot.mp3',
-            'crystalDash':'sfx/artifacts/crystal-dash.mp3','challengeStart':'sfx/challenges/challenge-start.mp3',
-            'challengeComplete':'sfx/challenges/challenge-complete.mp3',
-            'challengeFail':'sfx/challenges/challenge-fail.mp3',
-            'phantomAppear':'sfx/enemy/phantom-appear.mp3','phantomWhoosh':'sfx/enemy/phantom-whoosh.mp3',
-            'lancerCharge':'sfx/enemy/lancer-charge.mp3','lancerHit':'sfx/enemy/lancer-hit.mp3',
-            'summonerSpawn':'sfx/enemy/summoner-spawn.mp3','summonerSignal':'sfx/enemy/summoner-signal.mp3',
-            'warlockTeleport':'sfx/enemy/warlock-teleport.mp3','warlockDebuff':'sfx/enemy/warlock-debuff.mp3',
-            'sporeDeath':'sfx/enemy/spore-death.mp3','merchantOpen':'sfx/ui/merchant-open.mp3',
-            'merchantBuy':'sfx/ui/merchant-buy.mp3','weaponSwitch':'sfx/ui/weapon-switch.mp3',
-            'ionShot':'sfx/player/ion-shot.mp3','pulsarBeep':'sfx/hazards/pulsar-beep.mp3',
-        };
-        for (const [id, file] of Object.entries(sfxPaths)) {
-            const a = new Audio(this.basePath + file);
-            a.volume = this.volume;
-            a.preload = 'auto';
-            this.sounds[id] = a;
-        }
-        const musicPaths = {
-            'calm':'music/calm-loop.mp3','tense':'music/tense-loop.mp3',
-            'danger':'music/danger-loop.mp3','boss':'music/boss-loop.mp3',
-        };
-        for (const [id, file] of Object.entries(musicPaths)) {
-            const a = new Audio(this.basePath + file);
-            a.loop = true;
-            a.volume = 0;
-            a.preload = 'auto';
-            this.music[id] = a;
-        }
-        this.loaded = true;
-    }
-    setVolume(v) {
-        this.volume = v;
-        for (const a of Object.values(this.sounds)) a.volume = v;
-    }
-    play(id) {
-        if (!this.enabled || !this.sounds[id]) return;
-        const a = this.sounds[id];
-        a.currentTime = 0;
-        a.volume = this.volume;
-        try { a.play().catch(() => {}); } catch(e) {}
-    }
-    playMusic(mood) {
-        for (const [id, a] of Object.entries(this.music)) {
-            if (id === mood) {
-                if (a.paused) { a.currentTime = 0; a.volume = this.volume * 0.5; try { a.play().catch(() => {}); } catch(e) {} }
-            } else {
-                if (!a.paused) { a.volume = 0; a.pause(); a.currentTime = 0; }
-            }
-        }
-    }
-    stopMusic() {
-        for (const a of Object.values(this.music)) { a.pause(); a.currentTime = 0; }
-    }
-    setSFXVolume(v) { this.volume = v; for (const a of Object.values(this.sounds)) a.volume = v; }
-    setMusicVolume(v) { for (const a of Object.values(this.music)) { if (!a.paused) a.volume = v * 0.5; } }
+    constructor() { this.enabled = false; }
+    init() {}
+    play() {}
+    playMusic() {}
+    stopMusic() {}
+    setSFXVolume() {}
+    setMusicVolume() {}
+    setVolume() {}
 }
 // ============================================
-// Music Engine — .mp3 loop crossfader
+// Music Engine — disabled (no audio on GitHub Pages)
 // ============================================
 
 class MusicEngine {
-    constructor(soundEngine) {
-        this.sound = soundEngine;
-        this.running = false;
-        this.currentMood = 'calm';
-    }
-    start() {
-        this.running = true;
-        this.setMood(1);
-    }
-    setMood(wave) {
-        if (!this.running) return;
-        let mood;
-        if (wave <= 3) mood = 'calm';
-        else if (wave <= 6) mood = 'tense';
-        else if (wave <= 9) mood = 'danger';
-        else mood = 'boss';
-        if (mood === this.currentMood) return;
-        this.currentMood = mood;
-        this.sound.playMusic(mood);
-    }
-    stop() {
-        this.running = false;
-        this.sound.stopMusic();
-    }
+    constructor() { this.running = false; }
+    start() {}
+    setMood() {}
+    stop() {}
 }
 // ============================================
 // Achievement System
@@ -460,12 +356,12 @@ const MAX_ACTIVE_RUNES = 3;
 // ============================================
 
 const ECHO_DEFS = [
-    { id:'echo_adrenaline', name:'⚡ Адреналин', desc:'+40% скорость на 2 волны', icon:'⚡', duration:2, apply(p){p.speed*=1.4;p.baseSpeed*=1.4;} },
-    { id:'echo_glass', name:'🪟 Стеклянные пули', desc:'x2 урон, -50% HP на 2 волны', icon:'🪟', duration:2, apply(p){p.damage*=2;p.hp=Math.max(1,Math.floor(p.hp/2));} },
-    { id:'echo_shield', name:'🛡 Щит', desc:'Невосприимчивость на 2 волны', icon:'🛡', duration:2, apply(p){p.invincible=true;p.invincibleTimer=999;} },
-    { id:'echo_multi', name:'🔀 Залп', desc:'+2 projectiles на 2 волны', icon:'🔀', duration:2, apply(p){p.extraProjectiles=(p.extraProjectiles||0)+2;} },
-    { id:'echo_magnet', name:'🧲 Магнит', desc:'Радиус магнита x3 на 2 волны', icon:'🧲', duration:2, apply(p){if(p.magnet)p.magnetRadius*=3;} },
-    { id:'echo_crit', name:'🎯 Критический', desc:'+50% крит на 2 волны', icon:'🎯', duration:2, apply(p){p.critChance=(p.critChance||0)+0.5;} }
+    { id:'echo_adrenaline', name:'⚡ Адреналин', desc:'+40% скорость на 2 волны', icon:'⚡', duration:2, apply(p){p.speed*=1.4;p.baseSpeed*=1.4;}, revert(p){p.speed/=1.4;p.baseSpeed/=1.4;} },
+    { id:'echo_glass', name:'🪟 Стеклянные пули', desc:'x2 урон, -50% HP на 2 волны', icon:'🪟', duration:2, apply(p){p.damage*=2;p.hp=Math.max(1,Math.floor(p.hp/2));}, revert(p){p.damage/=2;} },
+    { id:'echo_shield', name:'🛡 Щит', desc:'Невосприимчивость на 2 волны', icon:'🛡', duration:2, apply(p){p.invincible=true;p.invincibleTimer=999;}, revert(p){p.invincible=false;p.invincibleTimer=0;} },
+    { id:'echo_multi', name:'🔀 Залп', desc:'+2 projectiles на 2 волны', icon:'🔀', duration:2, apply(p){p.extraProjectiles=(p.extraProjectiles||0)+2;}, revert(p){p.extraProjectiles=Math.max(0,(p.extraProjectiles||0)-2);} },
+    { id:'echo_magnet', name:'🧲 Магнит', desc:'Радиус магнита x3 на 2 волны', icon:'🧲', duration:2, apply(p){if(p.magnet)p.magnetRadius*=3;}, revert(p){if(p.magnet)p.magnetRadius/=3;} },
+    { id:'echo_crit', name:'🎯 Критический', desc:'+50% крит на 2 волны', icon:'🎯', duration:2, apply(p){p.critChance=(p.critChance||0)+0.5;}, revert(p){p.critChance=Math.max(0,(p.critChance||0)-0.5);} }
 ];
 
 // ============================================
@@ -1093,7 +989,7 @@ class Player {
         // Zombie infection: +1 dmg/sec for 3s
         if(this.zombieInfection){
             this.zombieInfectionTimer-=dt;this.zombieInfectionTick+=dt;
-            if(this.zombieInfectionTick>=1){this.zombieInfectionTick-=1;this.hp=Math.max(0,this.hp-this.zombieInfectionDmg);if(this.hp<=0){this.alive=false;}}
+            if(this.zombieInfectionTick>=1){this.zombieInfectionTick-=1;this.hp=Math.max(0,this.hp-this.zombieInfectionDmg);if(this.hp<=0){this.hp=0;this.alive=false;return{type:'zombieDeath'};}}
             if(this.zombieInfectionTimer<=0)this.zombieInfection=false;
         }
         return null;
@@ -1359,8 +1255,6 @@ class Game {
         this.unlockedAchievements = JSON.parse(localStorage.getItem('dvs_achievements') || '[]');
         this.selectedCosmetics = JSON.parse(localStorage.getItem('dvs_cosmetics') || '{}');
         this.highScores = JSON.parse(localStorage.getItem('dvs_highScores') || '[]');
-        this.sfxVolume = parseFloat(localStorage.getItem('dvs_sfxVolume') || '0.25');
-        this.musicVolumeSetting = parseFloat(localStorage.getItem('dvs_musicVolume') || '0.125');
         this.canvasResolution = parseInt(localStorage.getItem('dvs_resolution') || '1');
         this.selectedArenaTheme = localStorage.getItem('dvs_arenaTheme') || 'default';
         this.selectedDeathEffect = localStorage.getItem('dvs_deathEffect') || 'explosion';
@@ -1401,8 +1295,7 @@ class Game {
         this.currentArenaEvent = null;
         this.eventAnnouncementTimer = 0;
         this.waveEnemiesKilled = 0; this.waveStartTime = 0; this.consecutiveHits = 0;
-        this.sfxVolume = 0.25; this.musicVolumeSetting = 0.125; this.canvasResolution = 1;
-        this.selectedArenaTheme = 'default'; this.selectedDeathEffect = 'explosion';
+        // Settings already loaded from localStorage above — do not overwrite with defaults
     }
     getDailySeed() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
     getDailyChallengeModifier() {
@@ -1427,8 +1320,6 @@ class Game {
         localStorage.setItem('dvs_achievements', JSON.stringify(this.unlockedAchievements));
         localStorage.setItem('dvs_cosmetics', JSON.stringify(this.selectedCosmetics));
         localStorage.setItem('dvs_highScores', JSON.stringify(this.highScores));
-        localStorage.setItem('dvs_sfxVolume', String(this.sfxVolume));
-        localStorage.setItem('dvs_musicVolume', String(this.musicVolumeSetting));
         localStorage.setItem('dvs_resolution', String(this.canvasResolution));
         localStorage.setItem('dvs_arenaTheme', this.selectedArenaTheme);
         localStorage.setItem('dvs_autoFire', JSON.stringify(this.autoFire));
@@ -1453,7 +1344,7 @@ class Game {
         this.combo20Count=0;this.bossKillTime=0;this.bossSpawnTime=0;
         this.waveDamageTaken=0;this.flawlessWaves=0;
         this.runStats={damagePerShot:0,accuracy:0,shotsFired:0,shotsHit:0,favoriteUpgrade:'',damageTaken:0};
-        this.sporeClouds=[];this.merchantItems=[];
+        this.sporeClouds=[];this.merchantItems=[];this.merchantScore=0;
         this.endlessMode=false;this.endlessModeOffered=false;
         this.waveEnemiesKilled=0;this.waveStartTime=0;this.consecutiveHits=0;
         this.abilities=[null,null];this.abilityCooldowns=[0,0];
@@ -1462,6 +1353,8 @@ class Game {
         this.summonedGhosts=[];this.mimics=[];
         this.currentArenaEvent=null;this.eventAnnouncementTimer=0;
         this.showEchoSelect=false;this.echoChoices=[];this.echoWavesRemaining=0;
+        this.activeEchoId=null;this.activeChallenge=null;
+        window._zombieMode=false;
         // Apply arena biome theme
         this.background.setTheme(this.selectedArenaTheme||'default');
         // Apply prestige skills
@@ -1620,6 +1513,7 @@ class Game {
         if (pr) {
             if (pr.type === 'phasePhantom') this.phasePhantoms.push(new PhasePhantom(pr.x, pr.y, pr.damage));
             else if (pr.type === 'dash') this.sound.play('dash');
+            else if (pr.type === 'zombieDeath') { this.onPlayerDeath(); }
         }
         // Time Warp
         if (this.player.timeWarp && this.player.hp <= this.player.maxHp * 0.25 && this.player.timeWarpCooldown <= 0 && this.player.alive) {
@@ -1957,7 +1851,7 @@ class Game {
         this.waveManager.startNextWave(this.width, this.height);
         this.waveStartTime = 0; this.waveEnemiesKilled = 0;
         // Echo: count down waves remaining
-        if(this.echoWavesRemaining>0){this.echoWavesRemaining--;if(this.echoWavesRemaining<=0){/* echo expired */}}
+        if(this.echoWavesRemaining>0){this.echoWavesRemaining--;if(this.echoWavesRemaining<=0){const def=ECHO_DEFS.find(e=>e.id===this.activeEchoId);if(def&&def.revert)def.revert(this.player);this.activeEchoId=null;}}
         this.sound.play('waveStart');
         this.music.setMood(this.waveManager.wave);
         this.background.setWave(this.waveManager.wave);
@@ -2076,6 +1970,7 @@ class Game {
                 if (mx >= bx && mx <= bx + bw && my >= cy && my <= cy + 65) {
                     this.echoChoices[i].apply(this.player);
                     this.echoWavesRemaining = this.echoChoices[i].duration;
+                    this.activeEchoId = this.echoChoices[i].id;
                     this.showEchoSelect = false;
                     this.sound.play('skillUnlock');
                     this.spawnParticles(this.width/2, this.height/2, '#ffdd00', 12);
@@ -2138,20 +2033,6 @@ class Game {
         if (this.input.mouseJustClicked) {
             const mx = this.input.mouseX, my = this.input.mouseY;
             const cx = this.width / 2;
-            // SFX volume: 200-370
-            if (my >= 170 && my <= 195) {
-                const ratio = Math.max(0, Math.min(1, (mx - 200) / 170));
-                this.sfxVolume = ratio;
-                this.sound.setSFXVolume(ratio);
-                this.saveProgress();
-            }
-            // Music volume: 220-390
-            if (my >= 220 && my <= 245) {
-                const ratio = Math.max(0, Math.min(1, (mx - 200) / 170));
-                this.musicVolumeSetting = ratio;
-                this.sound.setMusicVolume(ratio);
-                this.saveProgress();
-            }
             // Particles toggle
             if (mx >= cx - 80 && mx <= cx + 80 && my >= 280 && my <= 310) {
                 this.particlesEnabled = !this.particlesEnabled;
@@ -3084,20 +2965,20 @@ class Game {
         ctx.fillStyle = '#ffdd00'; ctx.font = 'bold 28px Courier New';
         ctx.fillText('НАСТРОЙКИ', this.width/2, 50);
         const cx = this.width / 2;
-        // SFX Volume
-        ctx.fillStyle = '#fff'; ctx.font = '14px Courier New'; ctx.textAlign = 'left';
+        // SFX Volume (disabled)
+        ctx.fillStyle = '#666'; ctx.font = '14px Courier New'; ctx.textAlign = 'left';
         ctx.fillText('Громкость SFX:', 200, 168);
-        ctx.fillStyle = '#333'; ctx.fillRect(200, 175, 170, 15);
-        ctx.fillStyle = '#44aaff'; ctx.fillRect(200, 175, 170 * this.sfxVolume, 15);
-        ctx.strokeStyle = '#666'; ctx.lineWidth = 1; ctx.strokeRect(200, 175, 170, 15);
-        ctx.textAlign = 'right'; ctx.fillStyle = '#aaa'; ctx.fillText(`${Math.round(this.sfxVolume*100)}%`, 380, 168);
-        // Music Volume
-        ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; ctx.font = '14px Courier New';
+        ctx.fillStyle = '#222'; ctx.fillRect(200, 175, 170, 15);
+        ctx.fillStyle = '#555'; ctx.fillRect(200, 175, 170, 15);
+        ctx.strokeStyle = '#444'; ctx.lineWidth = 1; ctx.strokeRect(200, 175, 170, 15);
+        ctx.textAlign = 'right'; ctx.fillStyle = '#666'; ctx.fillText('Звуки отключены', 380, 168);
+        // Music Volume (disabled)
+        ctx.textAlign = 'left'; ctx.fillStyle = '#666'; ctx.font = '14px Courier New';
         ctx.fillText('Громкость музыки:', 200, 218);
-        ctx.fillStyle = '#333'; ctx.fillRect(200, 225, 170, 15);
-        ctx.fillStyle = '#aa44ff'; ctx.fillRect(200, 225, 170 * this.musicVolumeSetting, 15);
-        ctx.strokeStyle = '#666'; ctx.lineWidth = 1; ctx.strokeRect(200, 225, 170, 15);
-        ctx.textAlign = 'right'; ctx.fillStyle = '#aaa'; ctx.fillText(`${Math.round(this.musicVolumeSetting*100)}%`, 380, 218);
+        ctx.fillStyle = '#222'; ctx.fillRect(200, 225, 170, 15);
+        ctx.fillStyle = '#555'; ctx.fillRect(200, 225, 170, 15);
+        ctx.strokeStyle = '#444'; ctx.lineWidth = 1; ctx.strokeRect(200, 225, 170, 15);
+        ctx.textAlign = 'right'; ctx.fillStyle = '#666'; ctx.fillText('Звуки отключены', 380, 218);
         // Particles toggle
         ctx.textAlign = 'center';
         ctx.fillStyle = this.particlesEnabled ? '#44ff44' : '#ff4444';
